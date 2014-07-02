@@ -1,0 +1,41 @@
+<?php
+/**
+ * @file
+ * islandora_related_content.module
+ */
+
+module_load_include('inc', 'islandora_bioinformatics', 'forms/related_objects.form');
+
+function islandora_related_content_menu() {
+  $urls['islandora/object/%islandora_object/related_content'] = array(
+    'title' => 'Related Content',
+    'page callback' => 'islandora_related_objects_page',
+    'page arguments' => array(2),
+    'access callback' => 'islandora_related_objects_page_access',
+    'access arguments' => array(2),
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $urls['islandora/object/%islandora_object/related_content/add/%islandora_cmodel'] = array(
+    'title callback' => 'islandora_cmodel_action_title',
+    'title arguments' => array('Add', 5),
+    'page callback' => 'islandora_related_objects_add_callback',
+    'page arguments' => array(2, 5),
+    'access callback' => 'islandora_object_access',
+    'access arguments' => array(ISLANDORA_METADATA_EDIT, 2),
+    'type' => MENU_CALLBACK,
+  );
+
+  $urls['islandora/object/%islandora_object/related_content/ingest/%islandora_cmodel'] = array(
+    'title callback' => 'islandora_cmodel_action_title',
+    'title arguments' => array('Ingest', 5),
+    'page callback' => 'islandora_related_objects_ingest_callback',
+    'page arguments' => array(2, 5),
+    'access callback' => 'islandora_object_access',
+    'access arguments' => array(ISLANDORA_INGEST, 2),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $urls;
+}
+

@@ -1,0 +1,6 @@
+name = "Islandora Related Content"
+description = "A module which provides drupal forms for finding and managing related Islandora content."
+dependencies[] = islandora
+package = Islandora
+version = 7.x-dev
+core = 7.x

@@ -21,10 +21,11 @@
  *      'cmodel_id' = '',
  *      'relationships' = array(''),
  *      'related_objects_ids' = array(''),
- *      'page' = 0
- *      'solr_filters' = array(
- *    ),
- *
+ *      'num_found' = 10,
+ *      'page' = 0,
+ *      'num_pages' = 1,
+ *      'solr_filters' = array(''),
+ *      'refresh_query' = TRUE,
  *    ),
  *  );
  * @endcode
@@ -42,7 +43,7 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
   $object = islandora_object_load($object_id);
   $cmodel = islandora_cmodel_load($cmodel_id);
 
-  islandora_related_objects_ajax_response($form_state);
+  islandora_related_content_ajax_response($form_state);
 
   // Execut Solr Query
   if($form_state['islandora']['refresh_query']){
@@ -248,7 +249,7 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
   return $form;
 }
 
-function islandora_related_objects_ajax_response(&$form_state){
+function islandora_related_content_ajax_response(&$form_state){
   if(empty($form_state['triggering_element'])) return;
 
   // AJAX
@@ -295,7 +296,7 @@ function islandora_related_objects_ajax_response(&$form_state){
   }
 }
 
-function islandora_related_objects_submit(array $form, array &$form_state) {
+function islandora_related_content_submit(array $form, array &$form_state) {
   $object_id = $form_state['islandora']['object_id'];
   $object = islandora_object_load($object_id);
   $relationships = $form_state['islandora']['relationships'];
@@ -321,7 +322,7 @@ function islandora_related_objects_submit(array $form, array &$form_state) {
 }
 
 
-function islandora_related_objects_ajax($form, &$form_state) {
+function islandora_related_conetnt_ajax($form, &$form_state) {
   return $form;
 }
 

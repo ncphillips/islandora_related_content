@@ -14,7 +14,15 @@ module_load_include('inc', 'islandora_related_content', 'includes/access_callbac
 // Forms
 module_load_include('inc', 'islandora_related_content', 'forms/related_content.form');
 
+/**
+ * Implements hook_menu()
+ *
+ * @return mixed
+ */
 function islandora_related_content_menu() {
+  /**
+   * # Related Content Page
+   */
   $urls['islandora/object/%islandora_object/related_content'] = array(
     'title' => 'Related Content',
     'page callback' => 'islandora_related_content_page_callback',
@@ -25,6 +33,7 @@ function islandora_related_content_menu() {
     'file' => 'page_callbacks/related_content.page_callback.inc'
   );
 
+  /** # Add Relationship to an Object */
   $urls['islandora/object/%islandora_object/related_content/add/%islandora_cmodel'] = array(
     'title callback' => 'islandora_cmodel_action_title',
     'title arguments' => array('Add', 5),
@@ -35,6 +44,7 @@ function islandora_related_content_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  /** # Ingest new a new Object */
   $urls['islandora/object/%islandora_object/related_content/ingest/%islandora_cmodel'] = array(
     'title callback' => 'islandora_cmodel_action_title',
     'title arguments' => array('Ingest', 5),
@@ -49,7 +59,7 @@ function islandora_related_content_menu() {
 }
 
 /**
- * Implements hook_form_islandora_related_objects_form_alter()
+ * Implements hook_form_islandora_related_content_form_alter()
  *
  * Dynamically calls three hooks for altering a related content form:
  *
@@ -61,7 +71,7 @@ function islandora_related_content_menu() {
  * 'hook_form_islandora_A_related_objects_form_alter()' will also affect
  * the form for B.
  */
-function islandora_bioinformatics_form_islandora_related_objects_form_alter(&$form, &$formstate){
+function islandora_related_content_islandora_related_content_form_alter(&$form, &$formstate){
   $hooks = array();
 
   // Object

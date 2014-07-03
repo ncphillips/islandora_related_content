@@ -1,6 +1,6 @@
 <?php
 
-function islandora_related_content_ingest_callback($object, $cmodel){
+function islandora_related_content_ingest_page_callback($object, $cmodel){
   // Replace : with _ in CModel ID.
   $cmid = str_replace(':', '_', $cmodel->id);
 

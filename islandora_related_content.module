@@ -11,6 +11,9 @@ ini_set('display_startup_errors', TRUE);
 // Access Callbacks
 module_load_include('inc', 'islandora_related_content', 'includes/access_callbacks');
 
+// Query
+module_load_include('inc', 'islandora_related_content', 'includes/query_helper_functions.form');
+
 // Forms
 module_load_include('inc', 'islandora_related_content', 'forms/related_content.form');
 
@@ -42,17 +45,20 @@ function islandora_related_content_menu() {
     'access callback' => 'islandora_object_access',
     'access arguments' => array(ISLANDORA_METADATA_EDIT, 2),
     'type' => MENU_CALLBACK,
+    'file' => 'page_callbacks/add.page_callback.inc'
   );
 
   /** # Ingest new a new Object */
   $urls['islandora/object/%islandora_object/related_content/ingest/%islandora_cmodel'] = array(
     'title callback' => 'islandora_cmodel_action_title',
     'title arguments' => array('Ingest', 5),
-    'page callback' => 'islandora_related_content_ingest_callback',
+    'page callback' => 'islandora_related_content_ingest_page_callback',
     'page arguments' => array(2, 5),
     'access callback' => 'islandora_object_access',
     'access arguments' => array(ISLANDORA_INGEST, 2),
     'type' => MENU_CALLBACK,
+    'file' => 'page_callbacks/ingest.page_callback.inc'
+
   );
 
   return $urls;

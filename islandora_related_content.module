@@ -40,12 +40,12 @@ function islandora_related_content_menu() {
   $urls['islandora/object/%islandora_object/related_content/add/%islandora_cmodel'] = array(
     'title callback' => 'islandora_cmodel_action_title',
     'title arguments' => array('Add', 5),
-    'page callback' => 'islandora_related_content_add_callback',
-    'page arguments' => array(2, 5),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('add_relationship_form', 2, 5),
     'access callback' => 'islandora_object_access',
     'access arguments' => array(ISLANDORA_METADATA_EDIT, 2),
     'type' => MENU_CALLBACK,
-    'file' => 'page_callbacks/add.page_callback.inc'
+    'file' => 'forms/add_relationship.form.inc'
   );
 
   /** # Ingest new a new Object */

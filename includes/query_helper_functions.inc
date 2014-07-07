@@ -96,7 +96,7 @@ function islandora_object_related_islandora_objects($args){
   // Set page
   $_GET['page'] =  $page;
 
-//  file_put_contents('/Users/nolan/Desktop/query.txt', $query);
+  file_put_contents('/Users/nolan/Desktop/query.txt', $query);
 
   // Execute Query
   $query_processor->buildAndExecuteQuery($query);

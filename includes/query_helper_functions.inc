@@ -112,7 +112,7 @@ function islandora_object_related_islandora_objects($args){
       $results['ids'][] = $object_id['PID'];
     }
     $results['num_found'] = $solr_results['response']['numFound'];
-    $results['num_pages'] = (int)($results['num_found'] / variable_get('islandora_solr_num_of_results', 5));
+    $results['num_pages'] = (int)($results['num_found'] / variable_get('islandora_solr_num_of_results', 5)) + 1;
   }
 
   return $results;

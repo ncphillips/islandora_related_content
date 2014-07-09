@@ -56,17 +56,19 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
     '#suffix' => '</h1>',
   );
 
-  module_load_include('inc', 'islandora_related_content', 'forms/form_elements/solr_filter');
-  $form['solr_filter'] = solr_filter_element($form_state);
+  module_load_include('inc', 'islandora_related_content', 'forms/form_elements/islandora_related_content_form_elements');
+//  solr_filter_select_field_text_value_element($form, $form_state);
 
-  // Ingest and Add Objects
-  module_load_include('inc', 'islandora_related_content', 'forms/form_elements/ingest_add_element');
-  $form['ingest'] = ingest_element($form_state);
-  $form['add link'] = add_element($form_state);
+  $solr_factory = new SolrQueryFilterUIFactory($form, $form_state);
 
-  // Content Table-Select
-  module_load_include('inc', 'islandora_related_content', 'forms/form_elements/content_table_select');
-  $form['table'] = content_table_select($form_state);
+  $solr_factory->createSelectTextWidget(
+    array('PID'=>'ID')
+  );
+
+
+  ingest_element($form, $form_state);
+  add_element($form, $form_state);
+  content_table_select($form, $form_state);
 
   return $form;
 }

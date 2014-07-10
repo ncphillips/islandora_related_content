@@ -23,8 +23,9 @@ module_load_include('inc', 'islandora_related_content', 'forms/related_content.f
  * @return mixed
  */
 function islandora_related_content_menu() {
-  /**
-   * # Related Content Page
+  /** # Related Content Page
+   *
+   * Shows a Related Content form for each type of content related to this object.
    */
   $urls['islandora/object/%islandora_object/related_content'] = array(
     'title' => 'Related Content',

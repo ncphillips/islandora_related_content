@@ -14,6 +14,20 @@ class SolrQueryFilterUIFactory{
     $this->form_state = &$form_state;
   }
 
+  /**
+   * Create Select-Text Widget
+   *
+   * @param $fields
+   * @code
+   *    array(
+   *      'Field01' => 'Field Label 01',
+   *      'Field02' => 'Field Label 02',
+   *    );
+   * @endcode
+   *
+   * A Solr Filter Widget. The a list of fields to choose from is provided as a
+   * dropdown menu, and the user inputs the filter in the a text field.
+   */
   public function createSelectTextWidget($fields){
     $id = 'solr_select_text_widget_' . $this->num_widgets;
 
@@ -60,8 +74,50 @@ class SolrQueryFilterUIFactory{
     $this->num_widgets++;
   }
 
+  /**
+   * Create Label-Select Widget
+   *
+   * @param $field
+   * @code
+   *    array(
+   *      'solr_field',
+   *      'Label',
+   *    );
+   * @endcode
+   *
+   * @param $values
+   * @code
+   *    array(
+   *      'value 01' => 'label 01',
+   *      'value 02' => 'label 02',
+   *    );
+   * @endcode
+   */
   public function createLabelSelectWidget($field, $values){
     $id = 'solr_label_select_widget' . $this->num_widgets;
+
+    $element["{$id}_label"] = array(
+      '#markup' => $field[1]
+    );
+
+    $element['solr_filter_field_select'] = array(
+      '#type' => 'select',
+      '#options' => $values,
+      '#ajax' => array(
+        'callback' => 'solr_filter_field_select_ajax_return',
+        'wrapper' => $this->form_state['islandora']['form_div_id'],
+      ),
+    );
+
+    if (!empty($form_state['values'])){
+      if($form_state['values']['solr_filter_field_select']){
+        $filter = $field[0] . '\:' . $form_state['values']['solr_filter_field_select'];
+        $form_state['islandora']['solr_filters'][$filter] = $filter;
+      }
+    }
+
+    $form['solr_filter_field'] = $element;
+
   }
 }
 

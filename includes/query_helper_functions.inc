@@ -30,7 +30,7 @@
  *  )
  * @endcode
  */
-function islandora_object_related_islandora_objects($args){
+function related_islandora_objects($args){
   // Setup defaults
   $results['ids'] = array();
   $results['num_pages'] = 0;
@@ -104,9 +104,6 @@ function islandora_object_related_islandora_objects($args){
   $solr_results = $query_processor->islandoraSolrResult;
 
   if(!empty($solr_results)){
-//    echo '<pre>';
-//    var_dump(array_keys($solr_results['response']));
-//    echo '</pre>';
     // Generate list of PIDs
     foreach($solr_results['response']['objects'] as $object_id){
       $results['ids'][] = $object_id['PID'];

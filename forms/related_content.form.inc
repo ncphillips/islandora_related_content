@@ -56,19 +56,29 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
     '#suffix' => '</h1>',
   );
 
-  module_load_include('inc', 'islandora_related_content', 'forms/form_elements/islandora_related_content_form_elements');
+  module_load_include('inc', 'islandora_related_content', 'includes/RelatedContentUIFactory');
 //  solr_filter_select_field_text_value_element($form, $form_state);
 
-  $solr_factory = new SolrQueryFilterUIFactory($form, $form_state);
+  $solr_factory = new RelatedContentUIFactory($form, $form_state);
+
+  $solr_factory->createLabelSelectWidget(
+    array('RELS_EXT_hasModel_uri_mt', 'Specimen Type'),
+    array('islandora:sponge_cmodel'=>'Sponge', 'Banana'=>'Banana')
+  );
 
   $solr_factory->createSelectTextWidget(
-    array('PID'=>'ID')
+    array(
+      'PID'=>'ID',
+      'RELS_EXT_fedora-model_hasModel_uri_mt' => 'Content Type',
+    )
   );
 
 
-  ingest_element($form, $form_state);
-  add_element($form, $form_state);
-  content_table_select($form, $form_state);
+  $solr_factory->ingest_element($form, $form_state);
+  $solr_factory->add_element($form, $form_state);
+
+  $solr_factory->createContentTable();
+//  content_table_select($form, $form_state);
 
   return $form;
 }
@@ -86,3 +96,4 @@ function islandora_related_content_ajax($form, &$form_state) {
 function page_navigation_element(&$form_state){
 
 }
+

@@ -22,8 +22,9 @@ function add_relationship_form($form, &$form_state, $object, $cmodel){
     }
   }
 
-  module_load_include('inc', 'islandora_related_content', 'forms/form_elements/islandora_related_content_form_elements');
-  fedora_relationship_select($form, $form_state, $relationships);
+  module_load_include('inc', 'islandora_related_content', 'includes/RelatedContentUIFactory');
+  $rc_factory = new RelatedContentUIFactory($form, $form_state);
+  $rc_factory->fedora_relationship_select($form, $form_state, $relationships);
 
   $cmodels_and_labels = array(''=>'All');
   foreach(islandora_cmodel_subtypes($cmodel) as $cm){
@@ -31,13 +32,12 @@ function add_relationship_form($form, &$form_state, $object, $cmodel){
     $cmodels_and_labels[$cm] = $cm_obj->label;
   }
 
-  solr_filter_field_select($form, $form_state,
-    array('RELS_EXT_hasModel_uri_mt', 'Specimen Type'),
-    $cmodels_and_labels
-  );
-  solr_filter_select_field_text_value_element($form, $form_state);
+//  $rc_factory->createLabelSelectWidget(
+//    array('RELS_EXT_hasModel_uri_mt', 'Specimen Type'),
+//    $cmodels_and_labels
+//  );
 
-  content_table_select($form, $form_state, FALSE);
+  $rc_factory->createContentTable(FALSE);
 
   $form['submit'] = array(
     '#type' => 'submit',

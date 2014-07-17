@@ -78,7 +78,7 @@ function islandora_related_content_menu() {
  * 'hook_form_islandora_A_related_objects_form_alter()' will also affect
  * the form for B.
  */
-function islandora_related_content_islandora_related_content_form_alter(&$form, &$formstate){
+function islandora_related_content_form_islandora_related_content_form_alter(&$form, &$formstate){
   $hooks = array();
 
   // Object

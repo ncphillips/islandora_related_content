@@ -259,9 +259,6 @@ class RelatedContentUIFactory{
   }
 
 
-
-
-
   private function content_table_select_ajax_response(){
     if(empty($this->form_state['triggering_element'])) return;
 

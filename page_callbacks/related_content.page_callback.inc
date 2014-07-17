@@ -46,5 +46,6 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
     );
   }
 
+
   return $page;
 }

@@ -61,10 +61,6 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
 
   $solr_factory = new RelatedContentUIFactory($form, $form_state);
 
-  $solr_factory->createLabelSelectWidget(
-    array('RELS_EXT_hasModel_uri_mt', 'Specimen Type'),
-    array('islandora:sponge_cmodel'=>'Sponge', 'Banana'=>'Banana')
-  );
 
   $solr_factory->createSelectTextWidget(
     array(

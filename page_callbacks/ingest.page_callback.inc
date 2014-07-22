@@ -61,5 +61,24 @@ function islandora_related_content_ingest_page_callback($object, $cmodel){
   $new_object->relationships->add(ISLANDORA_RELS_EXT_URI, 'temp', $object);
 
   module_load_include('inc', 'islandora', 'includes/ingest.form');
-  return drupal_get_form('islandora_ingest_form', $config_data);
+  $form = drupal_get_form('islandora_ingest_form', $config_data);
+
+  // This was an attempt to make sure that the $cmodel->id is the default choice.
+
+//  $form['models']['#value'] = $cmodel->id;
+//  $form['models']['#default_value'] = $cmodel->id;
+//
+//  $associations = xml_form_builder_get_associations(array(), array($cmodel->id));
+//
+//  $form['association']['#value'] = $associations[array_keys($associations)[0]];
+//  $form['association']['#default_value'] = $associations[array_keys($associations)[0]];
+//
+//  $forms = xml_form_builder_select_association_form_get_forms($associations, $cmodel->id);
+//
+//  $form['available_forms']['#options'] = $forms;
+//  $form['available_forms']['#value'] = array_keys($forms)[0];
+//  $form['available_forms']['#default_value'] = array_keys($forms)[0];
+//  $form['hello'] = array('#markup' => 'WHAT!');
+
+  return $form;
 }

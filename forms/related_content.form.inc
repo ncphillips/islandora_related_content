@@ -62,14 +62,6 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
   $solr_factory = new RelatedContentUIFactory($form, $form_state);
 
 
-  $solr_factory->createSelectTextWidget(
-    array(
-      'PID'=>'ID',
-      'RELS_EXT_fedora-model_hasModel_uri_mt' => 'Content Type',
-    )
-  );
-
-
   $solr_factory->ingest_element($form, $form_state);
   $solr_factory->add_element($form, $form_state);
 
@@ -80,8 +72,47 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
 }
 
 
-function islandora_related_content_submit(array $form, array &$form_state) {
+function islandora_related_content_form_submit(array $form, array &$form_state) {
+  echo "Hello";
+  $selected = $form_state['input']['selected'];
 
+  switch($selected){
+    case ('remove'):
+      $parent_id = $form_state['islandora']['object_id'];
+      foreach($form_state['input']['table'] as $id => $remove_object){
+        if($remove_object){
+          $object = islandora_object_load($id);
+          foreach($form_state['islandora']['relationships'] as $ns_alias => $rels){
+
+            $ns = null;
+
+            switch($ns_alias){
+              case 'fedora':
+                $ns = FEDORA_RELS_EXT_URI;
+                break;
+              case 'fedora-model':
+                $ns = FEDORA_MODEL_URI;
+                break;
+              case 'islandora':
+                $ns = ISLANDORA_RELS_EXT_URI;
+                break;
+              case 'islandora-model':
+                $ns = ISLANDORA_MODEL_URI;
+                break;
+            }
+
+            if ($ns){
+              foreach($rels as $rel){
+                $a = $object->relationships->remove($ns, $rel, $parent_id);
+                echo '';
+              }
+            }
+          }
+        }
+      }
+      break;
+
+  }
 }
 
 

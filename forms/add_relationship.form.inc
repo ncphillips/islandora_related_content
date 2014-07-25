@@ -32,12 +32,15 @@ function add_relationship_form($form, &$form_state, $object, $cmodel){
     $cmodels_and_labels[$cm] = $cm_obj->label;
   }
 
-//  $rc_factory->createLabelSelectWidget(
-//    array('RELS_EXT_hasModel_uri_mt', 'Specimen Type'),
-//    $cmodels_and_labels
-//  );
+  $fields_array = array();
+  foreach($relationships as $pred_obj){
+    $fields_array[] = "RELS_EXT_{$pred_obj['predicate']['value']}_uri_mt:" . '"' . $object->id . '"';
+  }
 
-  $rc_factory->createContentTable(FALSE);
+  if ($fields_array)
+    $fields = '( *:* NOT ('.implode(' OR ', $fields_array).'))';
+
+  $rc_factory->createContentTable(FALSE, $fields);
 
   $form['submit'] = array(
     '#type' => 'submit',

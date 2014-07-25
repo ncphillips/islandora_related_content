@@ -30,9 +30,13 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
     $related_cmodel_id = $relationship['object']['value'];
 
     if($related_cmid_restriction == null or $related_cmid_restriction == $related_cmodel_id){
+      $alias = $relationship['predicate']['alias'];
+      if ($alias == 'fedora-system')
+        $alias = 'fedora';
+
       $pred = $relationship['predicate']['value'];
 
-      $related_content_form_args[$related_cmodel_id][] = $pred;
+      $related_content_form_args[$related_cmodel_id][$alias][] = $pred;
     }
   }
 

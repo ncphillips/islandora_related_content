@@ -168,9 +168,9 @@ class RelatedContentUIFactory{
   }
 
   /** Create Content Table  */
-  public function createContentTable($has_actions=TRUE){
+  public function createContentTable($has_actions=TRUE, $other_filters=''){
     $this->content_table_select_ajax_response();
-    $this->get_content();
+    $this->get_content($other_filters);
 
     $cmodel_id_fns = str_replace(':', '_', $this->form_state['islandora']['cmodel_id']);
     $form_div_id = $this->form_state['islandora']['form_div_id'];
@@ -196,7 +196,6 @@ class RelatedContentUIFactory{
       $element['actions']['submit'] =  array(
         '#type' => 'submit',
         '#value' => 'Submit',
-        '#submit' => array('content_table_select_actions_submit'),
       );
     }
 
@@ -290,7 +289,7 @@ class RelatedContentUIFactory{
     }
   }
 
-  private function get_content(){
+  private function get_content($other_filters=''){
     if(empty($this->form_state['islandora']['refresh_query']) or $this->form_state['islandora']['refresh_query']){
       $query_args = array();
 
@@ -355,6 +354,9 @@ class RelatedContentUIFactory{
         $this->form_state['islandora']['page'] = 0;
       }
 
+      if($other_filters)
+        $query_args['other'] = $other_filters;
+
       /** Execute the Solr Query */
       $related_content = related_islandora_objects($query_args);
       $this->form_state['islandora']['related_objects_ids'] = $related_content['ids'];
@@ -395,7 +397,7 @@ class RelatedContentUIFactory{
 
     $this->form['add_link'] = array(
       '#type' => 'markup',
-      '#markup' =>  l("Add Existing {$cmodel->label}",
+      '#markup' =>  l("Add {$cmodel->label}",
         "islandora/object/{$object->id}/related_content/add/{$cmodel->id}"),
       '#prefix' => '<div>',
       '#suffix' => '</div>',

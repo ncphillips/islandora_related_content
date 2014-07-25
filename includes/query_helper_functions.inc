@@ -14,7 +14,10 @@
  *  array(
  *    'object' => 'islandora:555',
  *    'cmodels' => array('islandora:specimen_cmodel'),
- *    'relationships' => array('isPartOf'),
+ *    'relationships' => array(
+ *      'fedora' => array('isPartOf'),
+ *      'islandora' => array('someRelationship', 'anotherRelationship'),
+ *    ),
  *    'page' => 2,
  *    'other' => 'PID:*', // Some Solr query
  * )
@@ -24,7 +27,7 @@
  * @return array
  * @code
  *  array(
- *    'id' => array(''),
+ *    'ids' => array(''),
  *    'num_found' => 10,
  *    'num_pages' => 2
  *  )
@@ -66,29 +69,38 @@ function related_islandora_objects($args){
   // If the relationships field is empty then we use all Fedora rels.
   if(empty($relationships)){
     $FEDORA_RELS_EXT_RELATIONSHIPS =  array(
-      'fedoraRelationship',
-      'isPartOf',             'hasPart',
-      'isConstituentOf',      'hasConstituent',
-      'isMemberOf',           'hasMember',
-      'isSubsetOf',           'hasSubset',
-      'isMemberOfCollection', 'hasCollectionMember',
-      'isDerivationOf',       'hasDerivation',
-      'isDependentOf',        'hasDependent',
-      'isDescriptionOf',      'hasDescription',
-      'isMetadataFor',        'hasMetadata',
-      'isAnnotationOf',       'hasAnnotation',
-      'hasEquivalent'
+      'fedora' => array(
+        'fedoraRelationship',
+        'isPartOf',             'hasPart',
+        'isConstituentOf',      'hasConstituent',
+        'isMemberOf',           'hasMember',
+        'isSubsetOf',           'hasSubset',
+        'isMemberOfCollection', 'hasCollectionMember',
+        'isDerivationOf',       'hasDerivation',
+        'isDependentOf',        'hasDependent',
+        'isDescriptionOf',      'hasDescription',
+        'isMetadataFor',        'hasMetadata',
+        'isAnnotationOf',       'hasAnnotation',
+        'hasEquivalent'
+      )
     );
     $relationships = $FEDORA_RELS_EXT_RELATIONSHIPS;
   }
 
   // RELSEXT queries
+  $fields = array();
   $rel_subqueries = array();
-  foreach($relationships as $rel){
-    $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:{$object_id}";
+  if($object_id != '*'){
+    foreach($relationships as $ns => $rels){
+      foreach($rels as $rel){
+        $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:{$object_id}";
+        $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_mt:{$object_id}";
+      }
+    }
   }
 
-  $query_parts[] = '(' . implode(' OR ',$rel_subqueries) . ')';
+  if ($rel_subqueries)
+    $query_parts[] = '(' . implode(' OR ',$rel_subqueries) . ')';
 
   // Whole Query
   $query = implode(' AND ', $query_parts);
@@ -96,7 +108,7 @@ function related_islandora_objects($args){
   // Set page
   $_GET['page'] =  $page;
 
-//  file_put_contents('/Users/nolan/Desktop/query.txt', $query);
+  file_put_contents('/Users/nolan/Desktop/query.txt', $query);
 
   // Execute Query
   $query_processor->buildAndExecuteQuery($query);

@@ -50,12 +50,7 @@ function islandora_related_content_ingest_page_callback($object, $cmodel){
 
   $new_object->label = 'New Object';
 
-  $models = array_merge(                    // Models to choose from are
-    array($cmodel->id),                     // the CModel passed in and
-    islandora_cmodel_subtypes($cmodel->id)  // all of it's Subtypes.
-  );
-
-  $config_data['models'] = $models;
+  $config_data['models'] = array($cmodel->id);
   $config_data['object'] = $new_object;
 
 

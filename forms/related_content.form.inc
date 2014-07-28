@@ -124,3 +124,61 @@ function page_navigation_element(&$form_state){
 
 }
 
+
+/**
+ * Implements hook_form_islandora_related_content_form_alter()
+ *
+ * Dynamically calls three hooks for altering a related content form:
+ *
+ *  1. form_islandora_OBJECT_CMODEL_related_objects_form
+ *  2. form_islandora_related_RELATED_CMODEL_objects_form
+ *  3. form_islandora_OBJECT_CMODEL_related_RELATED_CMODEL_objects_formo
+ *
+ * Each of these hooks are inherited. So if A is a supertype of B then
+ * 'hook_form_islandora_A_related_objects_form_alter()' will also affect
+ * the form for B.
+ */
+function islandora_related_content_form_islandora_related_content_form_alter(&$form, &$formstate){
+  $hooks = array();
+
+  // Object
+  $object = islandora_object_load($formstate['islandora']['object_id']);
+
+  // Related CModel
+  $related_cmodel_id = $formstate['islandora']['cmodel_id'];
+
+  // {Related CModel} UNION {Related CModel Supertypes}
+  $related_cmodel_types = array_merge(array($related_cmodel_id),
+    islandora_cmodel_supertypes($related_cmodel_id));
+
+  $rcm_count = 0;
+  foreach($related_cmodel_types as $rcm){
+    // Replace : with _ for hook name generation.
+    $rcm_str_replaced  = str_replace(':', '_', $rcm);
+
+    // Replace it in the array of Related CModel Types
+    $related_cmodel_types[$rcm_count] = $rcm_str_replaced;
+
+    // Hook function string.
+    $hooks[] = "form_islandora_related_{$rcm_str_replaced}_objects_form";
+    $rcm_count++;
+  }
+
+  // Remove the FedoraObject-3.0 from the list of the Object's CModels.
+  $object_models = array_diff($object->models, array('fedora-system:FedoraObject-3.0'));
+
+  // Iterate through the Object's CModels.
+  foreach($object_models as $ocm){
+    // Replate : with _ for hook name generation.
+    $object_cmodel = str_replace(':', '_', $ocm);
+
+    $hooks[] = "form_islandora_{$object_cmodel}_related_objects_form";
+
+    foreach($related_cmodel_types as $rcm){
+      $hooks[] = "form_islandora_{$object_cmodel}_related_{$rcm}_objects_form";
+    }
+  }
+
+  // Alter forms.
+  drupal_alter($hooks, $form, $formstate);
+}

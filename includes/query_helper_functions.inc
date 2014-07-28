@@ -66,16 +66,34 @@ function related_islandora_objects($args){
   if ($cmodel_subquery)
     $query_parts[] = '(' . implode(' OR ', $cmodel_subquery) . ')';
 
+
   // RELSEXT queries
   $fields = array();
   $rel_subqueries = array();
   if($object_id != '*'){
-    if(empty($relationships)){
-      $rel_subqueries[] = "*:{$object_id}";
-      $rel_subqueries[] = "*:info\:fedora/{$object_id}";
-    }
-      
     foreach($relationships as $ns => $rels){
+      // Relationships
+      // If the relationships field is empty then we use all Fedora rels.
+      if(empty($relationships)){
+        $FEDORA_RELS_EXT_RELATIONSHIPS =  array(
+            'fedora' => array(
+                  'fedoraRelationship',
+                  'isPartOf',             'hasPart',
+                  'isConstituentOf',      'hasConstituent',
+                  'isMemberOf',           'hasMember',
+                  'isSubsetOf',           'hasSubset',
+                  'isMemberOfCollection', 'hasCollectionMember',
+                  'isDerivationOf',       'hasDerivation',
+                  'isDependentOf',        'hasDependent',
+                  'isDescriptionOf',      'hasDescription',
+                  'isMetadataFor',        'hasMetadata',
+                  'isAnnotationOf',       'hasAnnotation',
+                  'hasEquivalent'
+                )
+            );
+        $relationships = $FEDORA_RELS_EXT_RELATIONSHIPS;
+      }
+
       foreach($rels as $rel){
         $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:{$object_id}";
         $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:info\:fedora/{$object_id}";

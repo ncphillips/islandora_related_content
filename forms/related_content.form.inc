@@ -68,12 +68,12 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
   $solr_factory->createContentTable();
 //  content_table_select($form, $form_state);
 
+
   return $form;
 }
 
 
 function islandora_related_content_form_submit(array $form, array &$form_state) {
-  echo "Hello";
   $selected = $form_state['input']['selected'];
 
   switch($selected){
@@ -104,7 +104,6 @@ function islandora_related_content_form_submit(array $form, array &$form_state) 
             if ($ns){
               foreach($rels as $rel){
                 $a = $object->relationships->remove($ns, $rel, $parent_id);
-                echo '';
               }
             }
           }

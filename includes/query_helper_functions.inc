@@ -60,41 +60,27 @@ function related_islandora_objects($args){
   foreach($cmodel_ids as $cmodel_id){
     $cmodel_id = str_replace(':', '\:', $cmodel_id);
     $cmodel_subquery[] = "RELS_EXT_hasModel_uri_mt:$cmodel_id";
+    $cmodel_subquery[] = "RELS_EXT_hasModel_uri_mt:info\:fedora/$cmodel_id";
   }
 
   if ($cmodel_subquery)
     $query_parts[] = '(' . implode(' OR ', $cmodel_subquery) . ')';
 
-  // Relationships
-  // If the relationships field is empty then we use all Fedora rels.
-  if(empty($relationships)){
-    $FEDORA_RELS_EXT_RELATIONSHIPS =  array(
-      'fedora' => array(
-        'fedoraRelationship',
-        'isPartOf',             'hasPart',
-        'isConstituentOf',      'hasConstituent',
-        'isMemberOf',           'hasMember',
-        'isSubsetOf',           'hasSubset',
-        'isMemberOfCollection', 'hasCollectionMember',
-        'isDerivationOf',       'hasDerivation',
-        'isDependentOf',        'hasDependent',
-        'isDescriptionOf',      'hasDescription',
-        'isMetadataFor',        'hasMetadata',
-        'isAnnotationOf',       'hasAnnotation',
-        'hasEquivalent'
-      )
-    );
-    $relationships = $FEDORA_RELS_EXT_RELATIONSHIPS;
-  }
-
   // RELSEXT queries
   $fields = array();
   $rel_subqueries = array();
   if($object_id != '*'){
+    if(empty($relationships)){
+      $rel_subqueries[] = "*:{$object_id}";
+      $rel_subqueries[] = "*:info\:fedora/{$object_id}";
+    }
+      
     foreach($relationships as $ns => $rels){
       foreach($rels as $rel){
         $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:{$object_id}";
+        $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:info\:fedora/{$object_id}";
         $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_mt:{$object_id}";
+        $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_mt:info\:fedora/{$object_id}";
       }
     }
   }
@@ -108,7 +94,7 @@ function related_islandora_objects($args){
   // Set page
   $_GET['page'] =  $page;
 
-  file_put_contents('/Users/nolan/Desktop/query.txt', $query);
+  //file_put_contents('/Users/nolan/Desktop/query.txt', $query);
 
   // Execute Query
   $query_processor->buildAndExecuteQuery($query);
@@ -137,6 +123,7 @@ function related_islandora_objects($args){
  * @param bool $subject
  *
  * @return array
+ *
 function i($id=null, $cmodels=null,  $relationships=null, $subject=FALSE) {
 
   // The default query finds objects that are targeting $id. If subject is set
@@ -201,7 +188,7 @@ function i($id=null, $cmodels=null,  $relationships=null, $subject=FALSE) {
     }
   ";
 
-  file_put_contents('/Users/nolan/Desktop/query.txt', $query);
+  /**file_put_contents('/Users/nolan/Desktop/query.txt', $query);
 
   $tuque = new IslandoraTuque();
   $result = $tuque->repository->ri->sparqlQuery($query);
@@ -213,5 +200,4 @@ function i($id=null, $cmodels=null,  $relationships=null, $subject=FALSE) {
   }
 
   return $related_objects;
-}
- */
+*/

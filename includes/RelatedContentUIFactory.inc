@@ -200,6 +200,7 @@ class RelatedContentUIFactory{
     }
 
     // Navigation
+    
     $element['previous_page'] = array(
       '#type' => 'button',
       '#value' => 'previous',
@@ -210,10 +211,15 @@ class RelatedContentUIFactory{
       ),
     );
 
+    if ($this->form_state['islandora']['page'] == 0){
+      $element['previous_page']['#disabled'] = TRUE;
+    }
+
     $element['page_num'] = array(
       '#markup' => $this->form_state['islandora']['page'] + 1,
     );
 
+    
     $element['next_page'] = array(
       '#type' => 'button',
       '#value' => 'next',
@@ -223,6 +229,10 @@ class RelatedContentUIFactory{
         'method' => 'replace',
       ),
     );
+
+    if ($this->form_state['islandora']['num_pages'] == $this->form_state['islandora']['page'] + 1){
+      $element['next_page']['#disabled'] = TRUE;
+    }
 
     $element['last_page'] = array(
       '#markup' => $this->form_state['islandora']['num_pages'],

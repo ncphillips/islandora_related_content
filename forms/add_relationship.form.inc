@@ -1,6 +1,9 @@
 <?php
 
 function add_relationship_form($form, &$form_state, $object, $cmodel){
+  if(!is_object($object)) $object = islandora_object_load($object);
+  if(!is_object($cmodel)) $cmodel = islandora_cmodel_load($cmodel);
+
   !empty($form_state['islandora']['target_id']) ? : ($form_state['islandora']['target_id'] = $object->id);
   !empty($form_state['islandora']['object_id']) ? : ($form_state['islandora']['object_id'] = '');
   !empty($form_state['islandora']['cmodel_id']) ? : ($form_state['islandora']['cmodel_id'] = $cmodel->id);

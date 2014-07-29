@@ -108,6 +108,9 @@ function related_islandora_objects($args){
 
   // Whole Query
   $query = implode(' AND ', $query_parts);
+//echo '<br/><pre>';
+//var_dump($query);
+//echo '</pre>';
 
   // Set page
   $_GET['page'] =  $page;

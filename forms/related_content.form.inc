@@ -75,6 +75,7 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
 
 function islandora_related_content_form_submit(array $form, array &$form_state) {
   $selected = $form_state['input']['selected'];
+echo $selected;
 
   switch($selected){
     case ('remove'):

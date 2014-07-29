@@ -34,9 +34,17 @@ function add_relationship_form($form, &$form_state, $object, $cmodel){
 
   $fields_array = array();
   foreach($relationships as $pred_obj){
-    $fields_array[] = "RELS_EXT_{$pred_obj['predicate']['value']}_uri_mt:" . '"' . $object->id . '"';
-    $fields_array[] = "RELS_EXT_{$pred_obj['predicate']['value']}_uri_mt:" . '"info:/fedora/' . $object->id . '"';
+    $value = $pred_obj['predicate']['value'];
+    $alias = ($pred_obj['predicate']['alias'] == 'fedora-system') ? 'fedora' : $pred_obj['predicate']['alias'];
+    $fields_array[] = "RELS_EXT_{$value}_uri_mt:" . '"' . $object->id . '"';
+    $fields_array[] = "RELS_EXT_{$alias}_{$value}_uri_mt:" . '"' . $object->id . '"';
+    $fields_array[] = "RELS_EXT_{$value}_uri_mt:" . '"info:fedora/' . $object->id . '"';
+    $fields_array[] = "RELS_EXT_{$alias}_{$value}_uri_mt:" . '"info:fedora/' . $object->id . '"';
   }
+
+//echo '<pre>';
+//var_dump($fields_array);
+//echo '</pre>';
 
   if ($fields_array)
     $fields = '( *:* NOT ('.implode(' OR ', $fields_array).'))';
@@ -57,6 +65,8 @@ function add_relationship_form($form, &$form_state, $object, $cmodel){
 }
 
 function add_relationship_form_submit($form, &$form_state){
+echo 'Submit';
+var_dump($form);
   $ns = $form_state['values']['namespace'];
   $pred = $form_state['values']['predicate'];
 

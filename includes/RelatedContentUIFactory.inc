@@ -238,6 +238,9 @@ class RelatedContentUIFactory{
       '#markup' => $this->form_state['islandora']['num_pages'],
     );
 
+//echo '<pre>';
+//var_dump($this->form_state['islandora']['related_objects_ids']);
+//echo '</pre>';
     // Table Options/Rows
     $options = array();
     foreach ($this->form_state['islandora']['related_objects_ids'] as $related_object_id) {

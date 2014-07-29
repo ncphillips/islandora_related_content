@@ -101,16 +101,13 @@ function related_islandora_objects($args){
         $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_mt:info\:fedora/{$object_id}";
       }
     }
-  }
+  }sM
 
   if ($rel_subqueries)
     $query_parts[] = '(' . implode(' OR ',$rel_subqueries) . ')';
 
   // Whole Query
   $query = implode(' AND ', $query_parts);
-echo $query;
-
-  echo $query;
 
   // Set page
   $_GET['page'] =  $page;

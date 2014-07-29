@@ -35,6 +35,7 @@ function add_relationship_form($form, &$form_state, $object, $cmodel){
   $fields_array = array();
   foreach($relationships as $pred_obj){
     $fields_array[] = "RELS_EXT_{$pred_obj['predicate']['value']}_uri_mt:" . '"' . $object->id . '"';
+    $fields_array[] = "RELS_EXT_{$pred_obj['predicate']['value']}_uri_mt:" . '"info:/fedora/' . $object->id . '"';
   }
 
   if ($fields_array)

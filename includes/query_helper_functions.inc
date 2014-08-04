@@ -49,6 +49,7 @@ function related_islandora_objects($args){
   $relationships = !empty($args['relationships']) ? $args['relationships'] : array();
   $page = !empty($args['page']) ? $args['page'] : 0;
   $other = !empty($args['other']) ? $args['other'] : array();
+  $unrelated = !empty($args['unrelated']) ? $args['unrelated'] : false;
 
   $query_parts = array();
 
@@ -71,10 +72,8 @@ function related_islandora_objects($args){
   $fields = array();
   $rel_subqueries = array();
   if($object_id != '*'){
-    foreach($relationships as $ns => $rels){
-      // Relationships
-      // If the relationships field is empty then we use all Fedora rels.
-      if(empty($relationships)){
+
+    if(empty($relationships)){
         $FEDORA_RELS_EXT_RELATIONSHIPS =  array(
             'fedora' => array(
                   'fedoraRelationship',
@@ -94,6 +93,7 @@ function related_islandora_objects($args){
         $relationships = $FEDORA_RELS_EXT_RELATIONSHIPS;
       }
 
+    foreach($relationships as $ns => $rels){
       foreach($rels as $rel){
         $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:{$object_id}";
         $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:info\:fedora/{$object_id}";
@@ -103,8 +103,14 @@ function related_islandora_objects($args){
     }
   }
 
-  if ($rel_subqueries)
-    $query_parts[] = '(' . implode(' OR ',$rel_subqueries) . ')';
+  if ($rel_subqueries) {
+    if (!$unrelated){
+      $query_parts[] = '(' . implode(' OR ',$rel_subqueries) . ')';
+    }
+    else {
+      $query_parts[] = '( *:* NOT ('.implode(' OR ', $rel_subqueries).'))';
+    }
+  }
 
   // Whole Query
   $query = implode(' AND ', $query_parts);
@@ -115,7 +121,7 @@ function related_islandora_objects($args){
   // Set page
   $_GET['page'] =  $page;
 
-  //file_put_contents('/Users/nolan/Desktop/query.txt', $query);
+  file_put_contents('/Users/nolan/Desktop/query.txt', $query);
 
   // Execute Query
   $query_processor->buildAndExecuteQuery($query);

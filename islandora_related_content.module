@@ -15,8 +15,7 @@ module_load_include('inc', 'islandora_related_content', 'includes/access_callbac
 module_load_include('inc', 'islandora_related_content', 'includes/query_helper_functions.form');
 
 // Forms
-module_load_include('inc', 'islandora_related_content', 'forms/related_content.form');
-module_load_include('inc', 'islandora_related_content', 'forms/add_relationship.form');
+module_load_include('inc', 'islandora_related_content', 'forms/rc.form');
 
 /**
  * Implements hook_menu()
@@ -36,18 +35,6 @@ function islandora_related_content_menu() {
     'access arguments' => array(2),
     'type' => MENU_LOCAL_TASK,
     'file' => 'page_callbacks/related_content.page_callback.inc'
-  );
-
-  /** # Add Relationship to an Object */
-  $urls['islandora/object/%islandora_object/related_content/add/%islandora_cmodel'] = array(
-    'title callback' => 'islandora_cmodel_action_title',
-    'title arguments' => array('Add', 5),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('add_relationship_form', 2, 5),
-    'access callback' => 'islandora_object_access',
-    'access arguments' => array(ISLANDORA_METADATA_EDIT, 2),
-    'type' => MENU_CALLBACK,
-    'file' => 'forms/add_relationship.form.inc'
   );
 
   /** # Ingest new a new Object */

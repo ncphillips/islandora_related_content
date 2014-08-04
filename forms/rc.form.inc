@@ -1,52 +1,33 @@
 <?php
 /**
- * @file
+ * Created by PhpStorm.
+ * User: nolan
+ * Date: 2014-07-31
+ * Time: 2:43 PM
  */
 
-/**
- * @param        $form
- * @param        $form_state
- * @param string $object_id
- * @param string $cmodel_id
- * @param array  $relationships
- *
- * @return mixed
- *
- *
- * # Form State
- * @code
- *  array(
- *    'islandora' = array(
- *      'object_id' = '',
- *      'cmodel_id' = '',
- *      'relationships' = array(''),
- *      'related_objects_ids' = array(''),
- *      'num_found' = 10,
- *      'page' = 0,
- *      'num_pages' = 1,
- *      'solr_filters' = array(''),
- *      'refresh_query' = TRUE,
- *    ),
- *  );
- * @endcode
- */
-function islandora_related_content_form($form, &$form_state, $object_id='', $cmodel_id='', $relationships=array()){
-  // Some Strings
-  $cmodel_id_fns = str_replace(':','_', $cmodel_id);
-  $form_div_id = "islandora_related_{$cmodel_id_fns}_form";
+function islandora_related_content_form($form, &$form_state, $object, $cmodel, $relationships){
+  if(!is_object($object)) $object = islandora_object_load($object);
+  if(!is_object($cmodel)) $cmodel = islandora_cmodel_load($cmodel);
+
+  $cmodel_safe = str_replace(':','_', $cmodel->id);
+  $form_div_id = "islandora_related_{$cmodel_safe}_form";
   $ajax_callback = 'islandora_related_content_ajax';
 
   // Formstate
-  !empty($form_state['islandora']['object_id']) ? : ($form_state['islandora']['object_id'] = $object_id);
-  !empty($form_state['islandora']['cmodel_id']) ? : ($form_state['islandora']['cmodel_id'] = $cmodel_id);
+  !empty($form_state['islandora']['object']) ? : ($form_state['islandora']['object'] = $object);
+  !empty($form_state['islandora']['cmodel']) ? : ($form_state['islandora']['cmodel'] = $cmodel);
+  !empty($form_state['islandora']['cmodel_safe']) ? : ($form_state['islandora']['cmodel_safe'] = $cmodel_safe);
+
   !empty($form_state['islandora']['relationships']) ? : ($form_state['islandora']['relationships'] = $relationships);
   !empty($form_state['islandora']['form_div_id']) ? : ($form_state['islandora']['form_div_id'] = $form_div_id);
+
+  !empty($form_state['islandora']['current_form']) ? : ($form_state['islandora']['current_form'] = 'related_content');
+
   !empty($form_state['islandora']['ajax_callback']) ? : ($form_state['islandora']['ajax_callback'] = $ajax_callback);
 
-  $cmodel = islandora_cmodel_load($cmodel_id);
-
   // Wrape the entire form.
-  $form['#prefix'] = "<div id='$form_div_id'>";
+  $form['#prefix'] = "<div id='{$form_div_id}'>";
   $form['#suffix'] = '</div>';
 
   // Header
@@ -57,29 +38,39 @@ function islandora_related_content_form($form, &$form_state, $object_id='', $cmo
   );
 
   module_load_include('inc', 'islandora_related_content', 'includes/RelatedContentUIFactory');
-//  solr_filter_select_field_text_value_element($form, $form_state);
+  $related_content_factory = new RelatedContentUIFactory($form, $form_state);
 
-  $solr_factory = new RelatedContentUIFactory($form, $form_state);
+  $related_content_factory->switch_form_link();
 
+  if ($form_state['islandora']['current_form'] == 'related_content'){
+    $related_content_factory->createContentTable();
+  }
+  else{
+    $related_content_factory->fedora_relationship_select();
+//    $form['submit'] = array(
+//      '#type' => 'submit',
+//      '#value' => t('Add Relationship'),
+//    );
+    $related_content_factory->createContentTable(TRUE, TRUE);
+    $form['content_table_select']['actions']['selected']['#options']['add'] = 'Add Relationship';
+    $form['content_table_select']['actions']['selected']['#disabled'] = TRUE;
+    $form['content_table_select']['actions']['selected']['#default_value'] = 'add';
+    $form['content_table_select']['actions']['selected']['#prefix'] = '<div style="display:none;">';
+    $form['content_table_select']['actions']['selected']['#suffix'] = '</div>';
+    $form['content_table_select']['actions']['submit']['#value'] = 'Add Relationship';
 
-  $solr_factory->ingest_element($form, $form_state);
-  $solr_factory->add_element($form, $form_state);
-
-  $solr_factory->createContentTable();
-//  content_table_select($form, $form_state);
+  }
 
 
   return $form;
 }
 
-
-function islandora_related_content_form_submit(array $form, array &$form_state) {
-  $selected = $form_state['input']['selected'];
-echo $selected;
+function islandora_related_content_form_submit($form, $form_state){
+  $selected = $form_state['values']['selected'];
 
   switch($selected){
     case ('remove'):
-      $parent_id = $form_state['islandora']['object_id'];
+      $parent = $form_state['islandora']['object'];
       foreach($form_state['input']['table'] as $id => $remove_object){
         if($remove_object){
           $object = islandora_object_load($id);
@@ -104,24 +95,30 @@ echo $selected;
 
             if ($ns){
               foreach($rels as $rel){
-                $a = $object->relationships->remove($ns, $rel, $parent_id);
+                $a = $object->relationships->remove($ns, $rel, $parent);
               }
             }
           }
         }
       }
       break;
+    case ('add'):
+      $ns = $form_state['values']['namespace'];
+      $pred = $form_state['values']['predicate'];
+
+      $obj = $form_state['islandora']['object'];
+
+      foreach($form_state['values']['table'] as $sub_id => $add_rel){
+        if ($add_rel){
+          $sub = islandora_object_load($sub_id);
+          if ($sub){
+            $sub->relationships->add($ns, $pred, $obj);
+          }
+        }
+      }
+      break;
 
   }
-}
-
-
-function islandora_related_content_ajax($form, &$form_state) {
-  return $form;
-}
-
-function page_navigation_element(&$form_state){
-
 }
 
 
@@ -142,10 +139,10 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
   $hooks = array();
 
   // Object
-  $object = islandora_object_load($formstate['islandora']['object_id']);
+  $object = islandora_object_load($formstate['islandora']['object']);
 
   // Related CModel
-  $related_cmodel_id = $formstate['islandora']['cmodel_id'];
+  $related_cmodel_id = $formstate['islandora']['cmodel'];
 
   // {Related CModel} UNION {Related CModel Supertypes}
   $related_cmodel_types = array_merge(array($related_cmodel_id),

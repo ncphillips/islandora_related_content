@@ -167,12 +167,13 @@ class RelatedContentUIFactory{
     $this->form['solr_filter_text'] = $element;
   }
 
-  /** Create Content Table  */
-  public function createContentTable($has_actions=TRUE, $other_filters=''){
-    $this->content_table_select_ajax_response();
-    $this->get_content($other_filters);
 
-    $cmodel_id_fns = str_replace(':', '_', $this->form_state['islandora']['cmodel_id']);
+  /** Create Content Table  */
+  public function createContentTable($has_actions=TRUE, $unrelated=FALSE, $other_filters=''){
+    $this->content_table_select_ajax_response();
+    $this->get_content($other_filters, $unrelated);
+
+    $cmodel_safe = $this->form_state['islandora']['cmodel_safe'];
     $form_div_id = $this->form_state['islandora']['form_div_id'];
 
     $id = $form_div_id . '_content_table_select';
@@ -200,7 +201,7 @@ class RelatedContentUIFactory{
     }
 
     // Navigation
-    
+
     $element['previous_page'] = array(
       '#type' => 'button',
       '#value' => 'previous',
@@ -219,7 +220,7 @@ class RelatedContentUIFactory{
       '#markup' => $this->form_state['islandora']['page'] + 1,
     );
 
-    
+
     $element['next_page'] = array(
       '#type' => 'button',
       '#value' => 'next',
@@ -262,7 +263,7 @@ class RelatedContentUIFactory{
       ),
       '#options' => $options,
       '#empty' => t("Null."),
-      '#prefix' => "<div id='solr_filter_$cmodel_id_fns'>",
+      '#prefix' => "<div id='solr_filter_$cmodel_safe'>",
       '#suffix' => '</div>',
     );
 
@@ -271,7 +272,10 @@ class RelatedContentUIFactory{
   }
 
 
+
+
   private function content_table_select_ajax_response(){
+
     if(empty($this->form_state['triggering_element'])) return;
 
     // AJAX
@@ -302,13 +306,15 @@ class RelatedContentUIFactory{
     }
   }
 
-  private function get_content($other_filters=''){
+  private function get_content($other_filters='', $unrelated=false){
     if(empty($this->form_state['islandora']['refresh_query']) or $this->form_state['islandora']['refresh_query']){
       $query_args = array();
 
+      $query_args['unrelated'] = $unrelated;
+
       /** Object */
-      if(!empty($this->form_state['islandora']['object_id'])){
-        $query_args['object'] = $this->form_state['islandora']['object_id'];
+      if(!empty($this->form_state['islandora']['object'])){
+        $query_args['object'] = $this->form_state['islandora']['object'];
 
         /** Relationships
          * Only matter if there's an Object ID. The objects we find must have one
@@ -322,9 +328,9 @@ class RelatedContentUIFactory{
       /**
        * Content Model
        */
-      if (!empty($this->form_state['islandora']['cmodel_id'])){
+      if (!empty($this->form_state['islandora']['cmodel'])){
 
-        $query_args['cmodels'] = array($this->form_state['islandora']['cmodel_id']);
+        $query_args['cmodels'] = array($this->form_state['islandora']['cmodel']);
       }
 
       /** Solr Fitlers
@@ -398,28 +404,48 @@ class RelatedContentUIFactory{
     );
   }
 
-  public function add_element(){
-    !empty($this->form_state['islandora']['object_id']) ? : ($form_state['islandora']['object_id'] = '');
-    !empty($this->form_state['islandora']['cmodel_id']) ? : ($form_state['islandora']['cmodel_id'] = '');
+  public function switch_form_link(){
+    $add_label = 'Add Relationship >>';
+    $back_label = '<< Back';
+    $label = $add_label;
+    if (!empty($this->form_state['triggering_element']['#value'])
+      and $this->form_state['triggering_element']['#value'] == $add_label){
+      $this->form_state['islandora']['current_form'] = 'add_relationship';
+      $label = $back_label;
+    }
 
-    $object = islandora_object_load($this->form_state['islandora']['object_id']);
-    $cmodel = islandora_cmodel_load($this->form_state['islandora']['cmodel_id']);
+    if (!empty($this->form_state['triggering_element']['#value'])
+      and $this->form_state['triggering_element']['#value'] == $back_label){
+      $this->form_state['islandora']['current_form'] = 'related_content';
+    }
 
+    $object = $this->form_state['islandora']['object'];
     $can_add    = islandora_object_access(ISLANDORA_METADATA_EDIT,     $object)
     and islandora_object_access(ISLANDORA_MANAGE_PROPERTIES, $object);
 
-    $this->form['add_link'] = array(
-      '#type' => 'markup',
-      '#markup' =>  l("Add {$cmodel->label}",
-        "islandora/object/{$object->id}/related_content/add/{$cmodel->id}"),
-      '#prefix' => '<div>',
-      '#suffix' => '</div>',
-      '#access' => $can_add
+    $this->form['switch_form_link'] = array(
+      '#type' => 'button',
+      '#value' => $label,
+      '#ajax' => array(
+        'callback' => 'ajax_return_related_content_form',
+        'wrapper' => $this->form_state['islandora']['form_div_id'],
+        'effect' => 'fade',
+      ),
     );
+
+    if ($label == $add_label)
+      $this->form['switch_form_link']['#access'] = $can_add;
   }
 
+  /**
+   * Unfortunately, I'm going to make this function only work with the fedora-system
+   * namespace for now.
+   */
+  public function fedora_relationship_select(){
+    $form = &$this->form;
+    $form_state = &$this->form_state;
+    $relationships = $this->form_state['islandora']['relationships'];
 
-  public function fedora_relationship_select(&$form, &$form_state, $relationships){
     // Wrap this element in a div.
     $element['#prefix'] = "<div id='fedora_relationship_select'>";
     $element['#suffix'] = "</div>";
@@ -436,11 +462,24 @@ class RelatedContentUIFactory{
      * @endcode
      */
     $namespaces = array(''=> t('< Namespace >'), );
-    foreach($relationships as $pred_obj){
-      $ns_uri = $pred_obj['predicate']['namespace'];
-      $alias = $pred_obj['predicate']['alias'];
-
-      $namespaces[$ns_uri] = $alias;
+    foreach($relationships as $alias => $rel){
+      switch($alias){
+        case 'fedora':
+        case 'fedora-system':
+          $namespaces[FEDORA_RELS_EXT_URI] = $alias;
+          break;
+        case 'fedora-model':
+          $namespaces[FEDORA_MODEL_URI] = $alias;
+          break;
+        case 'islandora':
+          $namespaces[ISLANDORA_RELS_EXT_URI] = $alias;
+          break;
+        case 'islandora-model':
+          $namespaces[ISLANDORA_MODEL_URI] = $alias;
+          break;
+        default:
+            break;
+      }
     }
 
     // NAMESPACE SELECTOR
@@ -456,8 +495,8 @@ class RelatedContentUIFactory{
     );
 
     if (sizeof($namespaces) == 2){
-      $ns = array_diff(array_keys($namespaces), array(''));
-      $form_state['islandora']['namespace'] = $ns[1];
+      $ns = array_diff(array_keys($namespaces), array(''))[1];
+      $form_state['islandora']['namespace'] = array($ns, $namespaces[$ns]);
       $element['namespace']['#prefix'] = '<div id="namespace_select" style="display:none;">';
       $element['namespace']['#suffix'] = '</div>';
       $element['namespace']['#default_value'] = $ns;
@@ -481,10 +520,12 @@ class RelatedContentUIFactory{
 
     if ($form_state['islandora']['namespace']){
       $predicates  = array();
-      foreach($relationships as $pred_obj){
-        if($pred_obj['predicate']['namespace'] == $form_state['islandora']['namespace']){
-          $p = $pred_obj['predicate']['value'];
-          $predicates[$p] = $p;
+      foreach($relationships as $alias => $rels){
+        foreach($rels as $rel){
+          if($alias == $form_state['islandora']['namespace'][1]){
+            $p = $rel;
+            $predicates[$p] = $p;
+          }
         }
       }
 
@@ -526,4 +567,8 @@ function ajax_return_select_text_and_content_table_select($form, $form_state){
  */
 function ajax_return_fedora_relationship_select($form, &$form_state){
   return $form['fedora_relationship_select']['predicate'];
+}
+
+function ajax_return_related_content_form($form, &$form_state){
+  return $form;
 }

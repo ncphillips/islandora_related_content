@@ -40,6 +40,7 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
     }
   }
 
+  module_load_include('inc', 'islandora_related_content', 'forms/rc.form');
   // Create the Related Content Forms
   foreach($related_content_form_args as $related_cmodel_id => $rels){
     $page['content forms'][] = drupal_get_form(

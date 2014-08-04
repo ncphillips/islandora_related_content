@@ -405,36 +405,56 @@ class RelatedContentUIFactory{
   }
 
   public function switch_form_link(){
-    $add_label = 'Add Relationship >>';
-    $back_label = '<< Back';
-    $label = $add_label;
-    if (!empty($this->form_state['triggering_element']['#value'])
-      and $this->form_state['triggering_element']['#value'] == $add_label){
-      $this->form_state['islandora']['current_form'] = 'add_relationship';
-      $label = $back_label;
+    $add_label = 'Add';
+    $view_label = 'View';
+    $ingest_label = 'Ingest';
+
+    $all = array ($view_label, $add_label,);
+
+    $current = $view_label;
+
+    if (!empty($this->form_state['triggering_element']['#value'])){
+      $v = $this->form_state['triggering_element']['#value'];
+
+      switch ($v) {
+        case ($add_label):
+          $current = $add_label;
+          break;
+        case($view_label):
+          $current = $view_label;
+          break;
+        case($ingest_label):
+        $current = $ingest_label;
+          break;
+      }
     }
 
-    if (!empty($this->form_state['triggering_element']['#value'])
-      and $this->form_state['triggering_element']['#value'] == $back_label){
-      $this->form_state['islandora']['current_form'] = 'related_content';
-    }
+    $this->form_state['islandora']['current_form'] = $current;
 
     $object = $this->form_state['islandora']['object'];
     $can_add    = islandora_object_access(ISLANDORA_METADATA_EDIT,     $object)
     and islandora_object_access(ISLANDORA_MANAGE_PROPERTIES, $object);
 
-    $this->form['switch_form_link'] = array(
-      '#type' => 'button',
-      '#value' => $label,
-      '#ajax' => array(
-        'callback' => 'ajax_return_related_content_form',
-        'wrapper' => $this->form_state['islandora']['form_div_id'],
-        'effect' => 'fade',
-      ),
-    );
+    foreach ($all as $label){
+      $this->form[$label] = array(
+        '#type' => 'button',
+        '#value' => $label,
+        '#ajax' => array(
+          'callback' => 'ajax_return_related_content_form',
+          'wrapper' => $this->form_state['islandora']['form_div_id'],
+          'effect' => 'fade',
+        ),
+        '#disabled' => (($label != $current) ? false : true),
+        '#access' => ($label == $add_label) ? $can_add : true,
+      );
+    }
 
-    if ($label == $add_label)
-      $this->form['switch_form_link']['#access'] = $can_add;
+    $this->form[$ingest_label] = array(
+      '#type' => 'markup',
+      '#markup' => l($ingest_label, "islandora/object/{$this->form_state['islandora']['object']}/ingest/{$this->form_state['islandora']['cmodel']}"),
+      '#prefix' => '<span class="button">',
+      '#suffix' => '</span>',
+    );
   }
 
   /**

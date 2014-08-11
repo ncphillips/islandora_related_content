@@ -60,8 +60,8 @@ function related_islandora_objects($args){
   $cmodel_subquery = array();
   foreach($cmodel_ids as $cmodel_id){
     $cmodel_id = str_replace(':', '\:', $cmodel_id);
-    $cmodel_subquery[] = "RELS_EXT_hasModel_uri_mt:$cmodel_id";
-    $cmodel_subquery[] = "RELS_EXT_hasModel_uri_mt:info\:fedora/$cmodel_id";
+    $cmodel_subquery[] = "RELS_EXT_hasModel_uri_ms:$cmodel_id";
+    $cmodel_subquery[] = "RELS_EXT_hasModel_uri_ms:info\:fedora/$cmodel_id";
   }
 
   if ($cmodel_subquery)
@@ -95,10 +95,10 @@ function related_islandora_objects($args){
 
     foreach($relationships as $ns => $rels){
       foreach($rels as $rel){
-        $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:{$object_id}";
-        $rel_subqueries[] = "RELS_EXT_{$rel}_uri_mt:info\:fedora/{$object_id}";
-        $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_mt:{$object_id}";
-        $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_mt:info\:fedora/{$object_id}";
+        $rel_subqueries[] = "RELS_EXT_{$rel}_uri_ms:{$object_id}";
+        $rel_subqueries[] = "RELS_EXT_{$rel}_uri_ms:info\:fedora/{$object_id}";
+        $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_ms:{$object_id}";
+        $rel_subqueries[] = "RELS_EXT_{$ns}_{$rel}_uri_ms:info\:fedora/{$object_id}";
       }
     }
   }
@@ -127,6 +127,9 @@ function related_islandora_objects($args){
   $query_processor->buildAndExecuteQuery($query);
 
   $solr_results = $query_processor->islandoraSolrResult;
+
+//  var_dump($solr_results);
+
 
   if(!empty($solr_results)){
     // Generate list of PIDs

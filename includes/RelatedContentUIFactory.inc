@@ -344,7 +344,7 @@ class RelatedContentUIFactory{
        *        'param2' => 'b',
        *    ),
        *    'solr_select_text_widget' => array(
-       *      'RELS_EXT_fedora_hasModel_uri_mt:islandora\:invertebrate_cmodel' => array(
+       *      'RELS_EXT_fedora_hasModel_uri_ms:islandora\:invertebrate_cmodel' => array(
        *        'label' => 'Specimen Type: Invertebrate',
        *      ),
        *    ),

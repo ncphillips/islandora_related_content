@@ -377,6 +377,7 @@ class RelatedContentUIFactory{
         $query_args['other'] = $other_filters;
 
       /** Execute the Solr Query */
+      module_load_include('inc', 'islandora_cmodel', 'includes/query_helper_functions');
       $related_content = related_islandora_objects($query_args);
       $this->form_state['islandora']['related_objects_ids'] = $related_content['ids'];
       $this->form_state['islandora']['num_found'] = $related_content['num_found'];

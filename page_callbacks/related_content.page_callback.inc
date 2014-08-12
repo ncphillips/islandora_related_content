@@ -9,7 +9,7 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
 
   // Page State
   $page_state['object'] = $object;
-  $page_state['relationships'] = islandora_cmodel_relationships_towards($object_parent_model);
+  $page_state['relationships'] = islandora_cmodel_subject_relationships($object_parent_model);
 
   // Hooks to call.
   $hooks = array('islandora_related_objects_page');

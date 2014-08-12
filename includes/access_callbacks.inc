@@ -14,7 +14,7 @@ function islandora_related_content_page_access($object){
 
   /** @todo Yeah, this needs to be fixed.... */
   $object_parent_model = islandora_object_parent_model($object);
-  $relationships = islandora_cmodel_relationships_towards($object_parent_model);
+  $relationships = islandora_cmodel_subject_relationships($object_parent_model);
 
   // One Related Content Form per CModel.
   $related_content_form_args = array();

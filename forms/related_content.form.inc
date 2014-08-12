@@ -149,8 +149,7 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
   $related_cmodel_id = $formstate['islandora']['cmodel'];
 
   // {Related CModel} UNION {Related CModel Supertypes}
-  $related_cmodel_types = array_merge(array($related_cmodel_id),
-    islandora_cmodel_supertypes($related_cmodel_id));
+  $related_cmodel_types = islandora_cmodel_types($related_cmodel_id);
 
   $rcm_count = 0;
   foreach($related_cmodel_types as $rcm){

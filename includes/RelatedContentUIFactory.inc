@@ -8,7 +8,6 @@ class RelatedContentUIFactory{
   protected $form_state;
 
   public function __construct(&$form, &$form_state){
-    $this->num_widgets = 0;
     $this->form = &$form;
     $this->form_state = &$form_state;
   }
@@ -270,9 +269,6 @@ class RelatedContentUIFactory{
 
     $this->form['content_table_select'] = $element;
   }
-
-
-
 
   private function content_table_select_ajax_response(){
 

@@ -9,7 +9,8 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
 
   // Page State
   $page_state['object'] = $object;
-  $page_state['relationships'] = islandora_cmodel_subject_relationships($object_parent_model);
+  $page_state['subject_relationships'] = islandora_cmodel_subject_relationships($object_parent_model);
+  $page_state['object_relationships'] = islandora_cmodel_object_relationships($object_parent_model);
 
   // Hooks to call.
   $hooks = array('islandora_related_objects_page');
@@ -26,7 +27,7 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
 
   // One Related Content Form per CModel.
   $related_content_form_args = array();
-  foreach($page_state['relationships'] as $relationship){
+  foreach($page_state['subject_relationships'] as $relationship){
     $related_cmodel_id = $relationship['object']['value'];
 
     if($related_cmid_restriction == null or $related_cmid_restriction == $related_cmodel_id){
@@ -40,6 +41,7 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
     }
   }
 
+
   module_load_include('inc', 'islandora_related_content', 'forms/rc.form');
   // Create the Related Content Forms
   foreach($related_content_form_args as $related_cmodel_id => $rels){
@@ -50,6 +52,35 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
       $rels                             // Array of valid relationships
     );
   }
+
+
+//  // One Related Content Form per CModel.
+//  $related_content_form_args = array();
+//  foreach($page_state['object_relationships'] as $relationship){
+//    $related_cmodel_id = $relationship['object']['value'];
+//
+//    if($related_cmid_restriction == null or $related_cmid_restriction == $related_cmodel_id){
+//      $alias = $relationship['predicate']['alias'];
+//      if ($alias == 'fedora-system')
+//        $alias = 'fedora';
+//
+//      $pred = $relationship['predicate']['value'];
+//
+//      $related_content_form_args[$related_cmodel_id][$alias][] = $pred;
+//    }
+//  }
+//
+//
+//  // Create the Related Content Forms
+//  foreach($related_content_form_args as $related_cmodel_id => $rels){
+//    $page['content forms'][] = drupal_get_form(
+//      'islandora_related_content_form', // Form ID
+//      $object->id,                      // Object ID
+//      $related_cmodel_id,               // Related CModel ID
+//      $rels,                             // Array of valid relationships
+//      'RIGHT'
+//    );
+//  }
 
 
   return $page;

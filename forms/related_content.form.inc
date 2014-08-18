@@ -6,7 +6,7 @@
  * Time: 2:43 PM
  */
 
-function islandora_related_content_form($form, &$form_state, $object, $cmodel, $relationships){
+function islandora_related_content_form($form, &$form_state, $object, $cmodel, $relationships, $direction='LEFT'){
   if(!is_object($object)) $object = islandora_object_load($object);
   if(!is_object($cmodel)) $cmodel = islandora_cmodel_load($cmodel);
 

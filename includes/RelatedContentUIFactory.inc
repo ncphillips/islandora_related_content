@@ -243,12 +243,13 @@ class RelatedContentUIFactory{
 //echo '</pre>';
     // Table Options/Rows
     $options = array();
-    foreach ($this->form_state['islandora']['related_objects_ids'] as $related_object_id) {
-      $related_object = islandora_object_load($related_object_id);
-      $options[$related_object_id] = array(
-        'id' => $related_object_id,
-        'label' => $related_object->label,
-        'cmodel' => islandora_object_parent_model($related_object_id),
+    foreach ($this->form_state['islandora']['related_objects_ids'] as $related_solr_object) {
+      $id = (String)$related_solr_object;
+      $object = islandora_object_load($id);
+      $options[$object->id] = array(
+        'id' => $object->id,
+        'label' => $object->label,
+        'cmodel' => islandora_object_parent_model($object->id),
       );
     }
 
@@ -304,18 +305,32 @@ class RelatedContentUIFactory{
 
   private function get_content($other_filters='', $unrelated=false){
     if(empty($this->form_state['islandora']['refresh_query']) or $this->form_state['islandora']['refresh_query']){
-        $query_args['unrelated'] = $unrelated;
+        $iqs = new IslandoraSolrQueryset();
 
         /** Object */
         if(!empty($this->form_state['islandora']['object'])){
-          $query_args['object'] = $this->form_state['islandora']['object'];
+          $object = $this->form_state['islandora']['object'];
 
           /** Relationships
            * Only matter if there's an Object ID. The objects we find must have one
            * of the given relationships towards the Object ID.
            */
           if(!empty($this->form_state['islandora']['relationships'])){
-            $query_args['relationships'] = $this->form_state['islandora']['relationships'];
+            $relationships = $this->form_state['islandora']['relationships'];
+            if($unrelated){
+              foreach($relationships as $ns => $rels){
+                foreach($rels as $rel){
+                  $iqs->fields["RELS_EXT_{$rel}_uri_ms"]['#not'][] = "info\:fedora/{$object}";
+                }
+              }
+            }
+            else{
+              foreach($relationships as $ns => $rels){
+                foreach($rels as $rel){
+                  $iqs->fields["RELS_EXT_{$rel}_uri_ms"][] = "info\:fedora/{$object}";
+                }
+              }
+            }
           }
         }
 
@@ -323,58 +338,21 @@ class RelatedContentUIFactory{
        * Content Model
        */
       if (!empty($this->form_state['islandora']['cmodel'])){
-          $query_args['cmodels'] = array($this->form_state['islandora']['cmodel']);
-        }
-
-        /** Solr Fitlers
-             *
-             *
-             * @code
-             * $this->form_state['islandora']['solr_filters'] = array(
-             *    'widget_html_id' => array(
-             *      'field:value' => array(
-             *        'param1' => 'a',
-             *        'param2' => 'b',
-             *    ),
-             *    'solr_select_text_widget' => array(
-             *      'RELS_EXT_fedora_hasModel_uri_ms:islandora\:invertebrate_cmodel' => array(
-             *        'label' => 'Specimen Type: Invertebrate',
-             *      ),
-             *    ),
-             * );
-             * @endcode
-                 */
-        if(!empty($this->form_state['islandora']['solr_filters'])){
-          $filters_array= array();
-          // For each Solr Filter Widget
-          foreach($this->form_state['islandora']['solr_filters'] as $sf_widgets){
-            foreach($sf_widgets as $filter => $params){
-              $filters_array[] = $filter;
-            }
-          }
-          if($filters_array) {
-            $filters_query = '(' . implode(' AND ', $filters_array) . ')';
-            $query_args['other'] = $filters_query;
-          }
-        }
+        $cmodel = $this->form_state['islandora']['cmodel'];
+        $iqs->fields['RELS_EXT_hasModel_uri_ms'][] = 'info:fedora/'. $cmodel;
+      }
 
         /** Current Page */
         if (!empty($this->form_state['islandora']['page'])) {
-          $query_args['page'] = $this->form_state['islandora']['page'];
+          $iqs->page = $this->form_state['islandora']['page'];
         }
-        else{
+        else {
           $this->form_state['islandora']['page'] = 0;
         }
 
-        if($other_filters)
-          $query_args['other'] = $other_filters;
-
-        /** Execute the Solr Query */
-        module_load_include('inc', 'islandora_cmodel', 'includes/query_helper_functions');
-        $related_content = related_islandora_objects($query_args);
-        $this->form_state['islandora']['related_objects_ids'] = $related_content['ids'];
-        $this->form_state['islandora']['num_found'] = $related_content['num_found'];
-        $this->form_state['islandora']['num_pages'] = $related_content['num_pages'];
+        $this->form_state['islandora']['related_objects_ids'] = $iqs->objects;
+        $this->form_state['islandora']['num_found'] = $iqs->num_found;
+        $this->form_state['islandora']['num_pages'] = $iqs->num_pages;
     }
   }
 

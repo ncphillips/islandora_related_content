@@ -382,9 +382,15 @@ class RelatedContentUIFactory{
 
     $all = array ($view_label, $add_label,);
 
-    $current = $view_label;
+    if(!isset($this->form_state['islandora']['current_form'])){
+      $current = $view_label;
+    }
+    else{
+      $current = $this->form_state['islandora']['current_form'];
+    }
 
     if (!empty($this->form_state['triggering_element']['#value'])){
+      $this->form_state['islandora']['page'] = 0;
       $v = $this->form_state['triggering_element']['#value'];
 
       switch ($v) {

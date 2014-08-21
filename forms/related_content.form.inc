@@ -22,8 +22,6 @@ function islandora_related_content_form($form, &$form_state, $object, $cmodel, $
   !empty($form_state['islandora']['relationships']) ? : ($form_state['islandora']['relationships'] = $relationships);
   !empty($form_state['islandora']['form_div_id']) ? : ($form_state['islandora']['form_div_id'] = $form_div_id);
 
-  !empty($form_state['islandora']['current_form']) ? : ($form_state['islandora']['current_form'] = 'related_content');
-
   !empty($form_state['islandora']['ajax_callback']) ? : ($form_state['islandora']['ajax_callback'] = $ajax_callback);
 
   // Wrape the entire form.

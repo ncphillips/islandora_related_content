@@ -389,7 +389,8 @@ class RelatedContentUIFactory{
       $current = $this->form_state['islandora']['current_form'];
     }
 
-    if (!empty($this->form_state['triggering_element']['#value'])){
+    if (!empty($this->form_state['triggering_element']['#value'])
+      and in_array($this->form_state['triggering_element']['#value'], $all)){
       $this->form_state['islandora']['page'] = 0;
       $v = $this->form_state['triggering_element']['#value'];
 

@@ -320,14 +320,14 @@ class RelatedContentUIFactory{
             if($unrelated){
               foreach($relationships as $ns => $rels){
                 foreach($rels as $rel){
-                  $iqs->fields["RELS_EXT_{$rel}_uri_ms"]['#not'][] = "info\:fedora/{$object}";
+                  $iqs->fields["RELS_EXT_{$rel}_uri_ms"]['#not'][] = "info:fedora/{$object}";
                 }
               }
             }
             else{
               foreach($relationships as $ns => $rels){
                 foreach($rels as $rel){
-                  $iqs->fields["RELS_EXT_{$rel}_uri_ms"][] = "info\:fedora/{$object}";
+                  $iqs->fields["RELS_EXT_{$rel}_uri_ms"][] = "info:fedora/{$object}";
                 }
               }
             }

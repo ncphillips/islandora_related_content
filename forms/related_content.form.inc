@@ -152,7 +152,7 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
   $rcm_count = 0;
   foreach($related_cmodel_types as $rcm){
     // Replace : with _ for hook name generation.
-    $rcm_str_replaced  = str_replace(':', '_', $rcm);
+    $rcm_str_replaced  = str_replace(array(':', '.', '-'), '_', $rcm);
 
     // Replace it in the array of Related CModel Types
     $related_cmodel_types[$rcm_count] = $rcm_str_replaced;
@@ -168,7 +168,7 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
   // Iterate through the Object's CModels.
   foreach($object_models as $ocm){
     // Replate : with _ for hook name generation.
-    $object_cmodel = str_replace(':', '_', $ocm);
+    $object_cmodel = str_replace(array(':', '.', '-'), '_', $ocm);
 
     $hooks[] = "form_islandora_{$object_cmodel}_related_objects_form";
 

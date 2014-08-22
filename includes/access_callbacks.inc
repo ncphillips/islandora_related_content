@@ -14,20 +14,10 @@ function islandora_related_content_page_access($object){
 
   /** @todo Yeah, this needs to be fixed.... */
   $object_parent_model = islandora_object_parent_model($object);
-  $relationships = islandora_cmodel_subject_relationships($object_parent_model);
-
-  // One Related Content Form per CModel.
-  $related_content_form_args = array();
-  foreach($relationships as $relationship){
-    $related_cmodel_id = $relationship['object']['value'];
-
-      $pred = $relationship['predicate']['value'];
-
-      $related_content_form_args[$related_cmodel_id][] = $pred;
-  }
+  $relationships = islandora_cmodel_relationships($object_parent_model);
 
 
-  if ($object_is_cmodel or $object_is_collection or empty($related_content_form_args)){
+  if ($object_is_cmodel or $object_is_collection or empty($relationships)){
     return false;
   }
   else {

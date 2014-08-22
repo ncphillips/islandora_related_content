@@ -39,8 +39,8 @@ function islandora_related_content_menu() {
 
   /** # Ingest new a new Object */
   $urls['islandora/object/%islandora_object/ingest/%islandora_cmodel'] = array(
-    'title callback' => 'islandora_cmodel_action_title',
-    'title arguments' => array('Ingest', 4),
+    'title callback' => '__ingest_title',
+    'title arguments' => array(4),
     'page callback' => 'islandora_related_content_ingest_page_callback',
     'page arguments' => array(2, 4),
     'access callback' => 'islandora_object_access',
@@ -49,6 +49,24 @@ function islandora_related_content_menu() {
     'file' => 'page_callbacks/ingest.page_callback.inc'
   );
 
+  $urls['islandora/object/%islandora_cmodel/content'] = array(
+    'title' => 'Content',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_related_content_form',  2,  2, array()),
+    'access callback' => 'islandora_object_access',
+    'access arguments' => array(ISLANDORA_INGEST, 2),
+  );
+
   return $urls;
 }
 
+function __ingest_title($cmodel){
+  return "Ingest {$cmodel->label}";
+}
+
+function islandora_related_content_form_islandora_fedora_system_ContentModel_3_0_related_objects_form_alter(&$form, &$form_state){
+  unset($form['Add']);
+  unset($form['View']);
+
+}

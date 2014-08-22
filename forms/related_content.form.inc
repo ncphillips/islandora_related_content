@@ -142,6 +142,11 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
 
   // Object
   $object = islandora_object_load($formstate['islandora']['object']);
+  if(array_intersect(array('fedora-system:ContentModel-3.0'), $object->models))
+  {
+    unset($form['Add']);
+    unset($form['View']);
+  }
 
   // Related CModel
   $related_cmodel_id = $formstate['islandora']['cmodel'];
@@ -159,12 +164,11 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
 
     // Hook function string.
     $hook = "form_islandora_related_{$rcm_str_replaced}_objects_form";
-    drupal_alter($hook, $page, $page_state);
+    drupal_alter($hook, $form, $formstate);
     $rcm_count++;
   }
 
-  // Remove the FedoraObject-3.0 from the list of the Object's CModels.
-  $object_models = array_diff($object->models, array('fedora-system:FedoraObject-3.0'));
+  $object_models = islandora_object_models($object);
 
   // Iterate through the Object's CModels.
   foreach($object_models as $ocm){
@@ -175,7 +179,7 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
 
     foreach($related_cmodel_types as $rcm){
       $hook = "form_islandora_{$object_cmodel}_related_{$rcm}_objects_form";
-      drupal_alter($hook, $page, $page_state);
+      drupal_alter($hook, $form, $formstate);
     }
   }
 }

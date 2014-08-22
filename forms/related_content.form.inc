@@ -158,7 +158,8 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
     $related_cmodel_types[$rcm_count] = $rcm_str_replaced;
 
     // Hook function string.
-    $hooks[] = "form_islandora_related_{$rcm_str_replaced}_objects_form";
+    $hook = "form_islandora_related_{$rcm_str_replaced}_objects_form";
+    drupal_alter($hook, $page, $page_state);
     $rcm_count++;
   }
 
@@ -170,13 +171,11 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
     // Replate : with _ for hook name generation.
     $object_cmodel = str_replace(array(':', '.', '-'), '_', $ocm);
 
-    $hooks[] = "form_islandora_{$object_cmodel}_related_objects_form";
+    drupal_alter("form_islandora_{$object_cmodel}_related_objects_form", $form, $formstate);
 
     foreach($related_cmodel_types as $rcm){
-      $hooks[] = "form_islandora_{$object_cmodel}_related_{$rcm}_objects_form";
+      $hook = "form_islandora_{$object_cmodel}_related_{$rcm}_objects_form";
+      drupal_alter($hook, $page, $page_state);
     }
   }
-
-  // Alter forms.
-  drupal_alter($hooks, $form, $formstate);
 }

@@ -12,17 +12,15 @@ function islandora_related_content_page_callback($object, $related_cmid_restrict
   $page_state['relationships'] = islandora_cmodel_relationships($object_parent_model);
 
   // Hooks to call.
-  $hooks = array('islandora_related_objects_page');
+  drupal_alter('islandora_related_objects_page', $page, $page_state);
 
   // Related Content Page Alters are inherited.
   // It would be nice to make sure order is preserved.
   foreach($objects_models as $m){
-    $o = str_replace(':', "_", $m);
-    $hooks[] = "islandora_{$o}_related_objects_page";// Alter the related objects page for $cmid.
-
+    $o = str_replace(array(':', '-', '.'), "_", $m);
+    $hook = "islandora_{$o}_related_objects_page";// Alter the related objects page for $cmid.
+    drupal_alter($hook, $page, $page_state);
   }
-
-  drupal_alter($hooks, $page, $page_state);
 
   // One Related Content Form per CModel.
   $related_content_form_args = array();

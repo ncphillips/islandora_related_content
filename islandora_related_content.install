@@ -8,6 +8,7 @@
  * Implements hook_install().
  *
  * @see islandora_related_content_islandora_required_objects()
+ * @see hook_install()
  */
 function islandora_related_content_install() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');

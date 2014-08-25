@@ -8,19 +8,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
 
-// Access Callbacks
 module_load_include('inc', 'islandora_related_content', 'includes/access_callbacks');
-
-// Query
-module_load_include('inc', 'islandora_related_content', 'includes/query_helper_functions.form');
-
-// Forms
 module_load_include('inc', 'islandora_related_content', 'forms/related_content.form');
 
 /**
  * Implements hook_menu()
  *
- * @return mixed
+ * @see hook_menu()
  */
 function islandora_related_content_menu() {
   /** # Related Content Page

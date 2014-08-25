@@ -6,62 +6,72 @@
  */
 
 /**
- * hook_islandora_related_objects_page_alter
+ * hook_islandora_related_content_page_alter
  *
  * @param $page
  * @param $page_state
+ *
+ * @see islandora_related_content_page_callback()
  */
-function hook_islandora_related_objects_page_alter(&$page, &$page_state){
+function hook_islandora_related_content_page_alter(&$page, &$page_state){
 }
 
 /**
- * hook_islandora_OBJECT_CMODEL_objects_page_alter
+ * hook_islandora_OBJECT_CMODEL_content_page_alter
  *
  * @param $page
  * @param $page_state
  *
- * Alters the related objects page
+ * Alters the related content page
  * if the Object is of type OBJECT_CMODEL
+ *
+ * @see hook_islandora_related_content_page_alter()
  */
-function hook_islandora_OBJECT_CMODEL_objects_page_alter(&$page, &$page_state){}
+function hook_islandora_OBJECT_CMODEL_content_page_alter(&$page, &$page_state){}
 
 /**
  * @param $form
  * @param $form_state
  *
- * Alters the related objects form.
+ * Alters the related content form.
+ *
+ * @see islandora_related_content_form()
  */
-function hook_form_islandora_related_objects_form_alter(&$form, &$form_state){}
+function hook_form_islandora_related_content_form_alter(&$form, &$form_state){}
 
 /**
  * @param $form
  * @param $form_state
  *
- * Alters the related objects form
+ * Alters the related content form
  * if the Object is of type OBJECT_CMODEL
+ *
+ * @see hook_form_islandora_related_content_form_alter()
  */
-function hook_form_islandora_OBJECT_CMODEL_related_objects_form_alter(&$form, &$form_state){}
+function hook_form_islandora_OBJECT_CMODEL_related_content_form_alter(&$form, &$form_state){}
 
 
 /**
  * @param $form
  * @param $form_state
  *
- * Alters the related objects form
+ * Alters the related content form
  * if the Subject is of type RELATED_CMODEL
+ * @see hook_form_islandora_related_content_form_alter()
  */
-function hook_form_islandora_related_RELATED_CMODEL_objects_form_alter(&$form, &$form_state){}
+function hook_form_islandora_related_RELATED_CMODEL_content_form_alter(&$form, &$form_state){}
 
 
 /**
  * @param $form
  * @param $form_state
  *
- * Alters the related objects form
+ * Alters the related content form
  * if the Object is of type OBJECT_CMODEL
  * and the Subject is of type RELATED_CMODEL
+ * @see hook_form_islandora_related_content_form_alter()
  */
-function hook_form_islandora_OBJECT_CMODEL_related_RELATED_CMODEL_objects_form_alter(&$form, &$form_state){}
+function hook_form_islandora_OBJECT_CMODEL_related_RELATED_CMODEL_content_form_alter(&$form, &$form_state){}
 
 /**
  * @param $data

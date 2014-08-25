@@ -1,11 +1,19 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: nolan
- * Date: 2014-07-31
- * Time: 2:43 PM
+ * @file
  */
 
+/**
+ * @param $form
+ * @param $form_state
+ * @param $object
+ * @param $cmodel
+ * @param $relationships
+ * @param string $direction
+ * @return mixed
+ *
+ * @see hook_form_islandora_related_content_form_alter()
+ */
 function islandora_related_content_form($form, &$form_state, $object, $cmodel, $relationships, $direction='LEFT'){
   if(!is_object($object)) $object = islandora_object_load($object);
   if(!is_object($cmodel)) $cmodel = islandora_cmodel_load($cmodel);
@@ -35,10 +43,16 @@ function islandora_related_content_form($form, &$form_state, $object, $cmodel, $
     '#suffix' => '</h1>',
   );
 
+
   module_load_include('inc', 'islandora_related_content', 'includes/RelatedContentUIFactory');
   $related_content_factory = new RelatedContentUIFactory($form, $form_state);
 
   $related_content_factory->switch_form_link();
+
+  $form['solr_filters'] = array(
+    '#prefix' => "<div id='{$form_state['islandora']['form_div_id']}'>",
+    '#suffix' => '</div>'
+  );
 
 
   if ($form_state['islandora']['current_form'] == 'View'){
@@ -148,6 +162,8 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
     unset($form['View']);
   }
 
+
+
   // Related CModel
   $related_cmodel_id = $formstate['islandora']['cmodel'];
 
@@ -163,7 +179,7 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
     $related_cmodel_types[$rcm_count] = $rcm_str_replaced;
 
     // Hook function string.
-    $hook = "form_islandora_related_{$rcm_str_replaced}_objects_form";
+    $hook = "form_islandora_related_{$rcm_str_replaced}_content_form";
     drupal_alter($hook, $form, $formstate);
     $rcm_count++;
   }
@@ -175,10 +191,10 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
     // Replate : with _ for hook name generation.
     $object_cmodel = str_replace(array(':', '.', '-'), '_', $ocm);
 
-    drupal_alter("form_islandora_{$object_cmodel}_related_objects_form", $form, $formstate);
+    drupal_alter("form_islandora_{$object_cmodel}_related_content_form", $form, $formstate);
 
     foreach($related_cmodel_types as $rcm){
-      $hook = "form_islandora_{$object_cmodel}_related_{$rcm}_objects_form";
+      $hook = "form_islandora_{$object_cmodel}_related_{$rcm}_content_form";
       drupal_alter($hook, $form, $formstate);
     }
   }

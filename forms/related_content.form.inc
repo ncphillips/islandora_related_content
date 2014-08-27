@@ -26,10 +26,8 @@ function islandora_related_content_form($form, &$form_state, $object, $cmodel, $
   !empty($form_state['islandora']['object']) ? : ($form_state['islandora']['object'] = $object);
   !empty($form_state['islandora']['cmodel']) ? : ($form_state['islandora']['cmodel'] = $cmodel);
   !empty($form_state['islandora']['cmodel_safe']) ? : ($form_state['islandora']['cmodel_safe'] = $cmodel_safe);
-
   !empty($form_state['islandora']['relationships']) ? : ($form_state['islandora']['relationships'] = $relationships);
   !empty($form_state['islandora']['form_div_id']) ? : ($form_state['islandora']['form_div_id'] = $form_div_id);
-
   !empty($form_state['islandora']['ajax_callback']) ? : ($form_state['islandora']['ajax_callback'] = $ajax_callback);
 
   // Wrape the entire form.
@@ -60,10 +58,6 @@ function islandora_related_content_form($form, &$form_state, $object, $cmodel, $
   }
   elseif($form_state['islandora']['current_form'] == 'Add'){
     $related_content_factory->fedora_relationship_select();
-//    $form['submit'] = array(
-//      '#type' => 'submit',
-//      '#value' => t('Add Relationship'),
-//    );
     $related_content_factory->createContentTable(TRUE, TRUE);
     $form['content_table_select']['actions']['selected']['#options']['add'] = 'Add Relationship';
     $form['content_table_select']['actions']['selected']['#disabled'] = TRUE;
@@ -72,11 +66,6 @@ function islandora_related_content_form($form, &$form_state, $object, $cmodel, $
     $form['content_table_select']['actions']['selected']['#suffix'] = '</div>';
     $form['content_table_select']['actions']['submit']['#value'] = 'Add Relationship';
   }
-//    $form = array();
-//    $form = drupal_build_form('islandora_ingest_form', $form_state);
-//    $related_content_factory->switch_form_link();
-
-
 
   return $form;
 }
@@ -150,6 +139,9 @@ function islandora_related_content_form_submit($form, $form_state){
  * Each of these hooks are inherited. So if A is a supertype of B then
  * 'hook_form_islandora_A_related_objects_form_alter()' will also affect
  * the form for B.
+ *
+ * @see hook_form_islandora_related_content_form_alter()
+ * @see islandora_related_content_form()
  */
 function islandora_related_content_form_islandora_related_content_form_alter(&$form, &$formstate){
   $hooks = array();
@@ -166,16 +158,12 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
 
   // Related CModel
   $related_cmodel_id = $formstate['islandora']['cmodel'];
-
-  // {Related CModel} UNION {Related CModel Supertypes}
   $related_cmodel_types = islandora_cmodel_types($related_cmodel_id);
 
   $rcm_count = 0;
+  // Iterate through array of types and make the function safe version of them.
   foreach($related_cmodel_types as $rcm){
-    // Replace : with _ for hook name generation.
     $rcm_str_replaced  = str_replace(array(':', '.', '-'), '_', $rcm);
-
-    // Replace it in the array of Related CModel Types
     $related_cmodel_types[$rcm_count] = $rcm_str_replaced;
 
     // Hook function string.
@@ -186,9 +174,8 @@ function islandora_related_content_form_islandora_related_content_form_alter(&$f
 
   $object_models = islandora_object_models($object);
 
-  // Iterate through the Object's CModels.
+  // Iterate through the Object's CModels, making them function safe.
   foreach($object_models as $ocm){
-    // Replate : with _ for hook name generation.
     $object_cmodel = str_replace(array(':', '.', '-'), '_', $ocm);
 
     drupal_alter("form_islandora_{$object_cmodel}_related_content_form", $form, $formstate);

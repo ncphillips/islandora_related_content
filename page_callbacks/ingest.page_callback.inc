@@ -1,5 +1,16 @@
 <?php
+/**
+ * @file
+ */
 
+/**
+ * @param $object
+ * @param $cmodel
+ * @return array|mixed|void@
+ *
+ * @see hook_islandora_related_content_ingest_alter()
+ * @see hook_islandora_related_RELATED_CMODEL_content_ingest_alter()
+ */
 function islandora_related_content_ingest_page_callback($object, $cmodel){
   // Replace : with _ in CModel ID.
   $cmid = str_replace(':', '_', $cmodel->id);
@@ -20,6 +31,7 @@ function islandora_related_content_ingest_page_callback($object, $cmodel){
   // Config data for Ingestion.
   $config_data = array(
   /*
+   * @see islandora_ingest_form()
    * id
    * namespace
    * label
@@ -28,6 +40,9 @@ function islandora_related_content_ingest_page_callback($object, $cmodel){
    * parent
    */
   );
+
+  $new_object = $object->repository->constructObject();
+  $config_data['objects'] = array($new_object);
 
   $collection = islandora_object_load($data['collection']);
 
@@ -39,20 +54,12 @@ function islandora_related_content_ingest_page_callback($object, $cmodel){
     if (!$is_collection_object || !$has_policy) {
       return drupal_not_found();
     }
-    $new_object = $collection->repository->constructObject();
-    $config_data['collection'] = $collection;
-    $config_data['parent'] = $collection->id;
+    $config_data['collections'] = array($collection);
+    $new_object->relationships->add(FEDORA_RELS_EXT_URI, 'isMemberOfCollection', $collection);
   }
-  else {
-    $new_object = $object->repository->constructObject();
-    $config_data['parent'] = $object;
-  }
-
-  $new_object->label = 'New Object';
 
   $config_data['models'] = array($cmodel->id);
-  $config_data['object'] = $new_object;
-
+  $config_data['parent'] = $object;
 
   module_load_include('inc', 'islandora', 'includes/ingest.form');
   $form = drupal_get_form('islandora_ingest_form', $config_data);

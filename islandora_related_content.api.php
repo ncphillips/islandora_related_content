@@ -78,8 +78,10 @@ function hook_form_islandora_OBJECT_CMODEL_related_RELATED_CMODEL_content_form_a
  * array(
  *  'collection' => 'Some Collection PID.',
  * );
+ *
+ * @see islandora_related_content_ingest_page_callback()
  */
-function islandora_related_content_ingest_alter(&$data){
+function hook_islandora_related_content_ingest_alter(&$data){
   $data['collection'] = 'islandora:root';
 }
 
@@ -88,8 +90,10 @@ function islandora_related_content_ingest_alter(&$data){
  * array(
  *  'collection' => 'Some Collection PID.',
  * );
+ *
+ * @see islandora_related_content_ingest_page_callback()
  */
-function islandora_related_RELATED_CMODEL_content_ingest_alter(&$data){
+function hook_islandora_related_RELATED_CMODEL_content_ingest_alter(&$data){
   // If RELATED_CMODEL = islandora_specimen_cmodel
   $data['collection'] = 'islandora:specimen_collection';
 }

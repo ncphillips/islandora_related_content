@@ -56,7 +56,23 @@ function islandora_related_content_ingest_page_callback($object, $cmodel){
     }
     $config_data['collections'] = array($collection);
     $new_object->relationships->add(FEDORA_RELS_EXT_URI, 'isMemberOfCollection', $collection);
+
+    $policy = new CollectionPolicy($collection['COLLECTION_POLICY']->content);
+    $collection_models = $policy->getContentModels();
+
+    $cmodel_family = islandora_cmodel_types($cmodel);
+
+    $a = array_intersect($cmodel_family, array_keys($collection_models));
+
+    $collection_model = $collection_models[$a[0]];
+    $namespace = islandora_get_namespace($collection_model['namespace']);
   }
+  else{
+    preg_match('/^(.*):.*/', $object->id, $matches);
+    $namespace = $matches[1];
+  }
+
+  $new_object->id = $new_object->repository->getNextIdentifier($namespace, variable_get('islandora_basic_collection_generate_uuid', FALSE));
 
   $config_data['models'] = array($cmodel->id);
   $config_data['parent'] = $object;

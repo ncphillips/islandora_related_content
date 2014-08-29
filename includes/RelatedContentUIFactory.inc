@@ -339,20 +339,23 @@ class RelatedContentUIFactory{
        */
       if (!empty($this->form_state['islandora']['cmodel'])){
         $cmodel = $this->form_state['islandora']['cmodel'];
-        $iqs->fields['RELS_EXT_hasModel_uri_ms'][] = 'info:fedora/'. $cmodel;
+//        $iqs->fields['RELS_EXT_hasModel_uri_ms'][] = 'info:fedora/'. $cmodel;
+          $iqs->cmodels[] = 'info:fedora/'.$cmodel;
       }
 
-        /** Current Page */
-        if (!empty($this->form_state['islandora']['page'])) {
-          $iqs->page = $this->form_state['islandora']['page'];
-        }
-        else {
-          $this->form_state['islandora']['page'] = 0;
-        }
 
-        $this->form_state['islandora']['related_objects_ids'] = $iqs->objects;
-        $this->form_state['islandora']['num_found'] = $iqs->num_found;
-        $this->form_state['islandora']['num_pages'] = $iqs->num_pages;
+
+      /** Current Page */
+      if (!empty($this->form_state['islandora']['page'])) {
+        $iqs->page = $this->form_state['islandora']['page'];
+      }
+      else {
+        $this->form_state['islandora']['page'] = 0;
+      }
+
+      $this->form_state['islandora']['related_objects_ids'] = $iqs->objects;
+      $this->form_state['islandora']['num_found'] = $iqs->num_found;
+      $this->form_state['islandora']['num_pages'] = $iqs->num_pages;
     }
   }
 
